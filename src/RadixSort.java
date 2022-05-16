@@ -42,42 +42,22 @@ public class RadixSort {
 
     }
 
-    public static int getMin(int[] data){
-        int min = data[0];
-        for(int i = 1; i < data.length; i++){
-            if(data[i] < min){
-                min = data[i];
-            }
-        }
-        return min;
-    }
-    public static int getMax(int[] data){
-        int max = data[0];
-        for(int i = 1; i < data.length; i++){
-            if(data[i] > max){
-                max = data[i];
-            }
-        }
-        return max;
-    }
-
-    public static int[] count (int[] input, int min, int max){
-        int [] output = new int[max - min + 1];
+    
+    public static int[] count (int[] input){
+        int [] output = new int[256];
         for (int i = 0; i < output.length; i++) {
             output[i] = 0;
         }
         for(int i = 0; i< input.length; i++){
-            if(input[i] >= min && input[i] <= max){
-                output[input[i] - min] += 1;
-            }
+                output[input[i]] += 1;
+            
 
         }
         return output;
     }
 
     public static int[] countingSort(int[] input){
-        int min = getMin(input);
-        int[] helper = count(input, min, getMax((input)));
+        int[] helper = count(input);
         for (int i = helper.length-2; i >= 0; i--){
             helper[i] += helper[i+1];
         }
