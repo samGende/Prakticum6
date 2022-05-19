@@ -87,35 +87,34 @@ public class MSDRadixSort {
         }
     }
 
-    public static int[] sortByByte(int[] array, int l, int r, int b){
+    public static int[] sortByByte(int[] input, int l, int r, int b) {
+        int[] interval = new int[r-l+1];    // zu sortierende Werte
+        int[] freq = new int[257];  // Länge 257, um es direkt für MSDRadixsort zu verwenden
 
-        int [] frequenceArray = new int[257];
-
-        // frequence von bytes Zahlen
-        for(int i = l; i <= r; i++){
-            frequenceArray[(array[i] >> (8 * b)) & 0xFF ]++;
+        // Werte kopieren
+        for(int i=0; i < interval.length; i++) {
+            interval[i] = input[i + l];
         }
 
-        // frequence anpassen
-        for(int i = frequenceArray.length - 2; i >= 0; i--){
-            frequenceArray[i] += frequenceArray[i+1];
+        // Schlüssel zählen
+        for(int i=0; i < interval.length; i++) {
+            freq[(interval[i] >> (8*b)) & 0xFF]++;
         }
 
-        int[] output = new int[r -l + 1];
-
-        //zahlen sortieren
-        for(int i = array.length-1; i >= 0; i--){
-            output[frequenceArray[(array[i] >> (8 * b)) & 0xFF] -1 ] = array[i];
-            frequenceArray[(array[i] >> (8 * b)) & 0xFF]--;
+        // Positionen aufaddieren
+        for(int i= freq.length - 2; i >= 0; i--) {
+            freq[i] += freq[i+1];
         }
 
-        for(int i = 0; i < output.length; i ++){
-            array[i] = output[i];
+        // Elemente passend einsortieren
+        for(int i = interval.length-1; i >= 0; i--) {
+            int key = (interval[i] >> (8*b)) & 0xFF;   // Schlüssel berechnen
+            input[l + freq[key] - 1] = interval[i];
+            freq[key]--;
         }
 
-        return frequenceArray;
+        return freq;
     }
-
     public static boolean isSorted(int[] arr){
         for(int i = 0; i < arr.length-2; i++){
             if(arr[i+1] > arr[i]){
