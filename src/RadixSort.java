@@ -1,12 +1,45 @@
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.InputMismatchException;
+import java.util.Scanner;
 
 public class RadixSort {
     public static void main(String[] args) {
-        int a =1661914940 ;
-        int[] arr = new int[]{1, 0, 4, 5,6 };
-        arr[0] = a;
+        Scanner input = new Scanner(System.in);
+        ArrayList<Integer> list= new ArrayList<Integer>();
+        while (input.hasNext()) {
+            try {
+                list.add(input.nextInt());
+            } catch (InputMismatchException e){
+                System.err.println("Input contains a non number");
+            }
+            catch (NumberFormatException e) {
+                System.err.println("Input list contains a non-number.");
+                return;
+            }
+        }
+        int[]arr= new int[list.size()];
+        for (int i=0; i<list.size(); i++){
+            arr[i]=list.get(i);
+        }
+        if(arr.length == 0){
+            System.err.println("Empty list entered");
+            return;
+        }
+
+        Instant start = Instant.now();
         radixSort(arr);
-        System.out.println(Arrays.toString(arr));
+        Instant end = Instant.now();
+
+        double time = Duration.between(start, end).toMillis();
+        assert isSorted(arr);
+
+        System.out.println("sortiert " + Arrays.toString(arr));
+
+        System.out.println("Time: " + time);
+
 
 
     }
@@ -44,6 +77,15 @@ public class RadixSort {
             array[i] = output[i];
         }
 
+    }
+
+    public static boolean isSorted(int[] arr){
+        for(int i = 0; i < arr.length-2; i++){
+            if(arr[i+1] > arr[i]){
+                return false;
+            }
+        }
+        return true;
     }
 
 
