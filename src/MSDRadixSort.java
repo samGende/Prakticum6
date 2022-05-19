@@ -48,46 +48,48 @@ public class MSDRadixSort {
         msdRadix(data, 0, data.length-1, 3);
     }
 
-    public static void msdRadix(int[] data, int l, int r, int b){
-    		if(r<=l){
-    			return;
-        	}else if(r-l+1<=32){
-        		for(int i=l; i<=r; i++){
-        			int tosort=data[i];
-        			int j=i;
-        			while(j>l && tosort<data[j-1]){
-        				data[j]=data[j-1];
-        				j--;
-        			}
-        			data[j]=tosort;
-        		}
-        		return;
-        	}else{
-        		sortByByte(data, l, r, b);
-        		int[] subintervall=new int[257];
-        		subintervall[0]=l;
-        		int i=1;
-        		for(int j=subintervall[i-1];j<r;j++){
-        			int temp1=(data[j] >> (8 * b)) & 0xFF;
-        			int temp2=(data[j+1] >> (8 * b)) & 0xFF;
-        			if(temp1==temp2){
-        				subintervall[i]++;
-        			}else{
-        				subintervall[i]++;
-        				i++;
-        			}
-        		}
-        		for(int t=0; t<256;t++){
-        			msdRadix(data,subintervall[t],subintervall[t+1],b-1);
-        		}
-        	}
+    public static void msdRadix(int[] data, int l, int r, int b) {
+        // Abschnitte mit 1 oder 0 Elementen sind sortiert
+        if(r > l) {
+            // Kurze Abschnitte mit InsertionSort sortieren
+            if (r - l + 1 <= 32) {
+                insertionSort(data, l, r);
+            } else if (b >= 0) {
+                int[] c = sortByByte(data, l, r, b);
+
+                // Spiegle c[0, 255]
+                for (int i = 0; i < 255 / 2; i++) {
+                    int h = c[i];
+                    c[i] = c[255 - i];
+                    c[255 - i] = h;
+                }
+                c[256] = data.length; // kleinste Zahl geht bis zum Ende
+
+                // Sortiere alle Abschnitte
+                // Intervall [c[i], c[i+1]-1] enthält alle Werte mit b-tem Byte = 255 - i
+                for(int i=0; i < 256; i++) {
+                    msdRadix(data, c[i], c[i+1] - 1, b - 1);
+                }
+            }
         }
+    }
 
+    public static void insertionSort(int[] data, int l, int r) {
+        // Füge Elemente nacheinander an richtige Stelle ein
+        for(int i=l+1; i<=r; i++) {
+            int h = data[i];
+            // Solange noch kleinere Elemente links vorhanden sind, rücke diese auf
+            int j;
+            for(j = i; j > l && data[j - 1] < h; j--) {
+                data[j] = data[j - 1];
+            }
+            data[j] = h;
+        }
+    }
 
+    public static int[] sortByByte(int[] array, int l, int r, int b){
 
-    public static void sortByByte(int[] array, int l, int r, int b){
-
-        int [] frequenceArray = new int[256];
+        int [] frequenceArray = new int[257];
 
         // frequence von bytes Zahlen
         for(int i = l; i <= r; i++){
@@ -111,6 +113,7 @@ public class MSDRadixSort {
             array[i] = output[i];
         }
 
+        return frequenceArray;
     }
 
     public static boolean isSorted(int[] arr){
